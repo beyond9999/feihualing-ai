@@ -1,68 +1,166 @@
-# 飞花令 · 对诗李青莲
+# 🍶 飞花令 · 对诗李青莲
 
-玩家与 AI 扮演的李白轮流背含同一个令字的诗句。
+> 和 AI 李白行一场飞花令。诗句来自本地诗库，风流交给模型，事实不靠嘴硬。
 
-- AI **出句**全部来自本地 `chinese-poetry` 数据集，保证真实可核验、无幻觉；
-- AI 的**李白口吻**与玩家"集外句"的判定由 Seed Evolving（豆包，火山方舟）完成；
-- 后端 FastAPI，前端古风宣纸卷轴聊天界面，一个进程同时提供前后端。
+![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-backend-009688?style=flat-square&logo=fastapi&logoColor=white)
+![Vanilla JS](https://img.shields.io/badge/Frontend-HTML%20%2B%20CSS%20%2B%20JS-f7df1e?style=flat-square&logo=javascript&logoColor=222)
+![Poetry DB](https://img.shields.io/badge/Poetry-chinese--poetry-b08d3e?style=flat-square)
+![License](https://img.shields.io/badge/Status-Playable-9c3324?style=flat-square)
 
-## 目录结构
+## ✨ 项目简介
 
+这是一个网页飞花令游戏：玩家和 AI 扮演的李白围绕同一个令字轮流背诗。
+
+项目最在意的不是“让 AI 会背诗”，而是 **不让 AI 编诗**：
+
+- 📚 AI 出句来自本地 `chinese-poetry` 诗库，真实、可查、可追溯。
+- 🧪 玩家出句先过本地规则校验：是否含令字、是否重复、诗库是否存在。
+- 📝 数据库查不到的偏门句，可交给模型做“集外句”复核，并标记为“待考”。
+- 🎭 大模型只负责李白口吻、点评、吐槽、认输等表达层内容。
+
+## 🎮 玩法亮点
+
+| 功能 | 说明 |
+| --- | --- |
+| 🪷 令字对战 | 随机或自选令字，双方轮流背含该字的诗句 |
+| 📚 诗库兜底 | 接入 `chinese-poetry` 数据集，AI 不现场编诗 |
+| 🔁 重复判定 | 同一句诗双方都不能重复使用 |
+| 🎭 李白人设 | 开局、判负、认输等节点使用李白口吻回应 |
+| 🏅 段位结算 | 根据玩家撑过的回合数生成段位卡 |
+| 📱 移动端适配 | 手机和桌面浏览器都可以直接玩 |
+
+## 🧭 技术架构
+
+```mermaid
+flowchart LR
+    U[用户输入诗句] --> N[文本归一化<br/>去标点 / 繁简转换]
+    N --> K{包含本轮令字?}
+    K -- 否 --> L1[判负<br/>不合规则]
+    K -- 是 --> R{是否已用过?}
+    R -- 是 --> L2[判负<br/>重复出句]
+    R -- 否 --> D{本地诗库命中?}
+    D -- 是 --> V[通过校验<br/>记录作者与出处]
+    D -- 否 --> M[模型复核<br/>集外句判断]
+    M -- 不认可 --> L3[判负<br/>无此句]
+    M -- 认可 --> T[通过<br/>作者标记待考]
+    V --> A[AI 李白回应]
+    T --> A
+    A --> P[AI 从诗库出句]
+    P --> DB[(chinese-poetry)]
+    DB --> P
 ```
-backend/    FastAPI 服务（main.py 入口、game.py 对局逻辑、poetry_data.py 建索引、ai.py 模型层）
-frontend/   原生 HTML/CSS/JS，挂载在后端 / 路径下
-data/       放 chinese-poetry 数据集（见 data/README.md）
-.env        模型密钥（从 .env.example 复制，勿提交）
+
+## 🗂️ 目录结构
+
+```text
+backend/
+  main.py         FastAPI 入口
+  game.py         对局规则与 AI 出句策略
+  poetry_data.py  诗库加载、归一化、倒排索引
+  ai.py           模型调用与李白口吻生成
+
+frontend/
+  index.html      页面结构
+  style.css       古风界面与响应式样式
+  app.js          前端交互与接口调用
+  libai.svg       李白立绘
+
+data/
+  chinese-poetry/ 本地诗词数据集
 ```
 
-## 环境要求
+## 🚀 快速开始
 
-- Python 3.10+
-- Git（能访问 GitHub；如直连失败请自备代理或镜像）
-
-## 安装与启动
+### 1. 📦 准备数据集
 
 ```bash
-# 1. 取数据（仓库较大，建议 --depth 1）
 cd data
 git clone --depth 1 https://github.com/chinese-poetry/chinese-poetry.git
 cd ..
-
-# 2. 创建并激活虚拟环境
-python -m venv .venv
-# Windows (Git Bash):
-source .venv/Scripts/activate
-# Windows (PowerShell):
-# .venv\Scripts\Activate.ps1
-# macOS / Linux:
-# source .venv/bin/activate
-
-# 3. 安装依赖
-pip install -r backend/requirements.txt
-
-# 4. 配置模型密钥（可选；不配置也能玩，只是 AI 解说/集外句复核会降级为模板）
-cp .env.example .env
-# 然后编辑 .env，填入 ARK_API_KEY 和 ARK_MODEL（方舟接入点 id）
-
-# 5. 启动（代码已在内部把输出切到 UTF-8，无需设置环境变量）
-# 仅本机访问：
-uvicorn main:app --reload --port 8000 --app-dir backend
-# 局域网内（手机/其他电脑）也能访问：加 --host 0.0.0.0
-# uvicorn main:app --reload --host 0.0.0.0 --port 8000 --app-dir backend
-# Windows 首次会弹防火墙提示，点"允许"。
-# 查本机 IP：ipconfig | findstr IPv4  (Windows) / ifconfig (macOS/Linux)
-# 或先 cd backend 再运行：cd backend && uvicorn main:app --reload --port 8000
 ```
 
-> **首次启动较慢**：服务会扫描数据集并建立"字→诗句"倒排索引（约 360 万句），
-> 需数十秒，日志出现 `Uvicorn running on http://...` 后即就绪。之后每次启动都要重建索引（目前未做缓存）。
+### 2. 🐍 创建虚拟环境
 
-打开 http://localhost:8000 ，填一个令字（如"月"）即可开局。
+```bash
+python -m venv .venv
+```
 
-## 不配置 ARK_API_KEY 会怎样
+Windows PowerShell:
 
-核心对弈完全可用——AI 出句来自数据集，判定含字/重复也在本地完成。
-受限的只有两处：
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
 
-1. 玩家输入数据集里没有的句子时，无法让模型复核，直接判为"无此句"；
-2. AI 的寒暄/吐槽/认输用内置模板，而非李白口吻润色。
+macOS / Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+### 3. 🔧 安装依赖
+
+```bash
+pip install -r backend/requirements.txt
+```
+
+### 4. 🔑 配置模型密钥
+
+模型配置是可选的。不配置也能玩，只是李白口吻润色和集外句复核会降级。
+
+```bash
+cp .env.example .env
+```
+
+然后在 `.env` 中填写：
+
+```env
+ARK_API_KEY=你的火山方舟 API Key
+ARK_MODEL=你的方舟接入点 ID
+```
+
+### 5. 🏃 启动服务
+
+```bash
+uvicorn main:app --reload --port 8000 --app-dir backend
+```
+
+打开：
+
+```text
+http://localhost:8000
+```
+
+局域网访问：
+
+```bash
+uvicorn main:app --reload --host 0.0.0.0 --port 8000 --app-dir backend
+```
+
+> ⏳ 首次启动会扫描诗库并建立“字 -> 诗句”倒排索引，数据量较大，可能需要等待数十秒。看到 `Uvicorn running on http://...` 后再打开页面。
+
+## 📴 没有模型密钥会怎样？
+
+核心对弈仍然可用：
+
+- ✅ AI 出句依然来自本地诗库。
+- ✅ 含令字、重复、诗库命中等规则依然本地完成。
+- 💬 李白点评会使用内置模板。
+- ⚠️ 数据库查不到的玩家句子无法走模型复核。
+
+## 🧱 项目原则
+
+> 诗句归诗库，风流归李白。
+
+这个项目把事实判断和语言表达拆开：
+
+- 🧾 事实层：数据库与规则系统负责。
+- 🍷 表达层：模型负责李白口吻、酒桌气氛和情绪反馈。
+
+这样既能保留 AI 的趣味，也能避免它为了押韵或气氛随口编诗。
+
+## 🙏 致谢
+
+- 📚 [chinese-poetry](https://github.com/chinese-poetry/chinese-poetry)：中文诗词数据集
+- ⚡ [FastAPI](https://fastapi.tiangolo.com/)：后端服务框架
+- 🤖 Doubao / 火山方舟：模型能力支持
