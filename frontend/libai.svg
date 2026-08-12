@@ -1,0 +1,108 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="400" height="560">
+  <defs>
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fff8e0" stop-opacity="0.95"/>
+      <stop offset="70%" stop-color="#f6e7b8" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#f6e7b8" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="robe" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f3e3bd"/>
+      <stop offset="100%" stop-color="#d9bf86"/>
+    </linearGradient>
+    <linearGradient id="robeShadow" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#000" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 背景圆月 -->
+  <circle cx="290" cy="120" r="110" fill="url(#moonGlow)"/>
+  <circle cx="290" cy="120" r="62" fill="#fbf2cf" opacity="0.9"/>
+  <circle cx="268" cy="104" r="9" fill="#ecdca6" opacity="0.6"/>
+  <circle cx="305" cy="138" r="6" fill="#ecdca6" opacity="0.5"/>
+
+  <!-- 酒壶（身后露出） -->
+  <g transform="translate(70,300) rotate(-18)">
+    <ellipse cx="40" cy="60" rx="38" ry="46" fill="#8a5a2b"/>
+    <ellipse cx="40" cy="60" rx="38" ry="46" fill="url(#robeShadow)"/>
+    <rect x="30" y="8" width="20" height="16" rx="4" fill="#6e4620"/>
+    <path d="M28 20 Q10 30 18 52" stroke="#6e4620" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <text x="40" y="68" font-size="20" text-anchor="middle" fill="#f3e3bd" font-family="serif">酒</text>
+  </g>
+
+  <!-- 身体/长袍 -->
+  <path d="M200 250
+           C150 250 110 320 100 430
+           L300 430
+           C290 320 250 250 200 250 Z" fill="url(#robe)" stroke="#b8985a" stroke-width="2"/>
+  <!-- 衣纹 -->
+  <path d="M200 260 L200 425" stroke="#b8985a" stroke-width="1.5" opacity="0.6"/>
+  <path d="M160 300 Q175 360 170 425" stroke="#b8985a" stroke-width="1.2" fill="none" opacity="0.5"/>
+  <path d="M240 300 Q225 360 230 425" stroke="#b8985a" stroke-width="1.2" fill="none" opacity="0.5"/>
+  <!-- 腰带 -->
+  <path d="M128 360 Q200 372 272 360 L276 380 Q200 394 124 380 Z" fill="#a23b2a"/>
+  <!-- 领口 -->
+  <path d="M176 252 L200 296 L224 252 Z" fill="#fffdf2" stroke="#b8985a" stroke-width="1.5"/>
+
+  <!-- 左手（背后/扶壶） -->
+  <g transform="translate(118,332)">
+    <ellipse cx="0" cy="0" rx="16" ry="20" fill="#f0d4b0"/>
+  </g>
+
+  <!-- 右手举杯 -->
+  <g transform="translate(278,312) rotate(14)">
+    <path d="M0 0 Q14 8 16 24 L16 60" stroke="#f0d4b0" stroke-width="20" fill="none" stroke-linecap="round"/>
+    <!-- 酒杯（爵/盏） -->
+    <g transform="translate(20,4)">
+      <path d="M-18 0 L18 0 L12 26 L-12 26 Z" fill="#c9a24a" stroke="#8a6a26" stroke-width="1.5"/>
+      <ellipse cx="0" cy="0" rx="18" ry="5" fill="#e8c878" stroke="#8a6a26" stroke-width="1.5"/>
+      <ellipse cx="0" cy="0" rx="14" ry="3.5" fill="#b8412c" opacity="0.5"/>
+      <rect x="-3" y="26" width="6" height="14" fill="#8a6a26"/>
+      <path d="M18 4 Q34 4 32 16 Q30 22 22 20" fill="none" stroke="#8a6a26" stroke-width="2.5"/>
+    </g>
+  </g>
+
+  <!-- 脖子 -->
+  <rect x="186" y="232" width="28" height="28" rx="8" fill="#f0d4b0"/>
+
+  <!-- 头部 -->
+  <ellipse cx="200" cy="190" rx="62" ry="66" fill="#f5d9b5"/>
+  <!-- 脸颊红晕 -->
+  <ellipse cx="158" cy="206" rx="12" ry="8" fill="#e89a86" opacity="0.45"/>
+  <ellipse cx="242" cy="206" rx="12" ry="8" fill="#e89a86" opacity="0.45"/>
+
+  <!-- 耳朵 -->
+  <ellipse cx="140" cy="196" rx="9" ry="14" fill="#f0d0a8"/>
+  <ellipse cx="260" cy="196" rx="9" ry="14" fill="#f0d0a8"/>
+
+  <!-- 帽子（唐幞头） -->
+  <path d="M142 150 Q150 104 200 100 Q250 104 258 150 Q258 158 250 158 L150 158 Q142 158 142 150 Z" fill="#2b2620"/>
+  <!-- 帽顶小疙瘩 -->
+  <ellipse cx="200" cy="102" rx="10" ry="7" fill="#1c1814"/>
+  <!-- 幞头两脚（向两侧伸出） -->
+  <path d="M150 150 Q108 138 96 160 Q108 156 120 162 Q138 164 150 158 Z" fill="#2b2620"/>
+  <path d="M250 150 Q292 138 304 160 Q292 156 280 162 Q262 164 250 158 Z" fill="#2b2620"/>
+
+  <!-- 眉毛 -->
+  <path d="M168 178 Q178 170 190 176" stroke="#3a2e20" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  <path d="M210 176 Q222 170 232 178" stroke="#3a2e20" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+
+  <!-- 眼睛（微闭，带醉意的弧线） -->
+  <path d="M168 196 Q178 202 188 196" stroke="#2b2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M212 196 Q222 202 232 196" stroke="#2b2118" stroke-width="3" fill="none" stroke-linecap="round"/>
+
+  <!-- 鼻子 -->
+  <path d="M200 200 Q197 214 200 220 Q203 218 203 214" stroke="#cda57c" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <!-- 嘴（微笑） -->
+  <path d="M188 230 Q200 238 212 230" stroke="#9a4a38" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+  <!-- 胡须：上唇髭 -->
+  <path d="M180 228 Q172 234 168 240" stroke="#5a4a38" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <path d="M220 228 Q228 234 232 240" stroke="#5a4a38" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+  <!-- 长髯 -->
+  <path d="M186 238 Q176 276 184 306 Q200 286 200 256 Q200 286 216 306 Q224 276 214 238 Q206 246 200 244 Q194 246 186 238 Z"
+        fill="#f3ead8" stroke="#c9b98f" stroke-width="1.2"/>
+  <path d="M200 244 L200 300" stroke="#d8c89c" stroke-width="1"/>
+</svg>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>飞花令 · 对诗李青莲</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+
+    <!-- 顶部状态栏 -->
+    <header class="topbar">
+      <div class="brand">飞&nbsp;花&nbsp;令</div>
+      <div class="status">
+        <div class="kw-chip">
+          <span class="kw-label">令字</span>
+          <span id="kwChar" class="kw-char">—</span>
+        </div>
+        <div class="round-chip">
+          <span class="round-label">回合</span>
+          <span id="roundNum" class="round-num">1</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="stage">
+
+      <!-- 左：李白立绘 -->
+      <aside class="portrait-wrap">
+        <img id="libaiImg" src="libai.svg" alt="李白" class="portrait" />
+        <div class="name-seal">青莲居士</div>
+      </aside>
+
+      <!-- 右：聊天 -->
+      <section class="chat-col setup-mode">
+        <main id="chat" class="chat"></main>
+
+        <!-- 开局面板 -->
+        <div id="setup" class="setup">
+          <div class="setup-card">
+            <h2>飞花令</h2>
+            <p class="setup-hint">令字既定，你我各背含此字之诗句，接不上者负。</p>
+            <div class="draw-area">
+              <div id="drawnChar" class="drawn-char">–</div>
+              <button id="rerollBtn" class="reroll-btn" title="换一个字">换一字</button>
+            </div>
+            <div class="quick-chars">
+              <span class="quick-label">或自选：</span>
+              <button class="quick" data-kw="月">月</button>
+              <button class="quick" data-kw="春">春</button>
+              <button class="quick" data-kw="花">花</button>
+              <button class="quick" data-kw="酒">酒</button>
+              <button class="quick" data-kw="风">风</button>
+              <button class="quick" data-kw="山">山</button>
+            </div>
+            <button id="startBtn" class="start-btn">开 局</button>
+            <p id="setupErr" class="err"></p>
+          </div>
+        </div>
+
+        <!-- 输入栏 -->
+        <footer id="composer" class="composer" hidden>
+          <input id="lineInput" type="text" placeholder="请输入含此字的诗句……" autocomplete="off" />
+          <button id="sendBtn">传诗</button>
+          <button id="resignBtn" class="ghost">认输</button>
+        </footer>
+      </section>
+    </div>
+  </div>
+
+  <!-- 段位卡弹层 -->
+  <div id="rankOverlay" class="rank-overlay" hidden>
+    <div class="rank-card" id="rankCard">
+      <div class="rank-ribbon"><span id="rankTitle">进士及第</span></div>
+      <div class="rank-result" id="rankResult">你赢了李白</div>
+      <div class="rank-keyword">令字「<span id="rankKw">月</span>」</div>
+      <div class="rank-stats">
+        <div class="stat"><span id="rankRound">0</span><label>交锋回合</label></div>
+        <div class="stat-sep"></div>
+        <div class="stat"><span id="rankMoves">0</span><label>所背诗句</label></div>
+      </div>
+      <div class="rank-quote" id="rankQuote"></div>
+      <div class="rank-actions">
+        <button id="shotBtn">保存截图</button>
+        <button id="againBtn" class="ghost">再来一局</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
