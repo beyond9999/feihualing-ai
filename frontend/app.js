@@ -5,6 +5,9 @@ let keyword = "";
 let lastStats = null;
 let drawnKw = "";   // 当前抽到/选中的令字
 
+// 动态意象背景（ambient.js 可能尚未就绪，调用前判空）
+const ambient = () => window.ambient;
+
 // ---------- 消息渲染 ----------
 function addMsg(role, text, meta = "", extraClass = "") {
   const chat = $("#chat");
@@ -42,7 +45,12 @@ function setTopbar(kw, round) {
 // ---------- 抽令字 ----------
 async function drawKeyword(prefer) {
   const display = $("#drawnChar");
-  if (prefer) { drawnKw = prefer; display.textContent = prefer; return; }
+  if (prefer) {
+    drawnKw = prefer;
+    display.textContent = prefer;
+    ambient()?.setKeyword(drawnKw);
+    return;
+  }
   display.classList.add("loading");
   try {
     const res = await fetch("/api/keyword");
@@ -55,6 +63,7 @@ async function drawKeyword(prefer) {
   } finally {
     display.classList.remove("loading");
   }
+  ambient()?.setKeyword(drawnKw);
 }
 
 // ---------- 开局 ----------
@@ -117,10 +126,14 @@ async function sendMove() {
   thinking.remove();
   input.disabled = false; sendBtn.disabled = false; input.focus();
 
-  if (data.round != null) setTopbar(keyword, data.round);
+  if (data.round != null) {
+    setTopbar(keyword, data.round);
+    ambient()?.setRound(data.round);
+  }
 
   if (!data.accepted) {
     addMsg("ai", data.comment || "此句不妥，你输了。");
+    ambient()?.onReject();
     if (data.over) endGame(data.winner, data);
     return;
   }
@@ -142,6 +155,8 @@ async function sendMove() {
       data.ai.author ? `—— ${data.ai.author}${data.ai.title ? "《" + data.ai.title + "》" : ""}` : "");
   }
   if (data.comment) addMsg("ai", data.comment);
+  ambient()?.onAccepted();
+  if (data.ai) ambient()?.onAIMove();
   if (data.over) endGame(data.winner, data);
 }
 
@@ -206,10 +221,12 @@ function endGame(winner, data) {
     ? "斗酒诗百篇，君亦敌手。"
     : (lastStats.comment || "诗酒趁年华，改日再战。");
   $("#rankOverlay").hidden = false;
+  if (won) ambient()?.onWin(); else ambient()?.onLose();
 }
 
 function resetUI() {
   sessionId = null; keyword = ""; lastStats = null;
+  ambient()?.reset();
   $("#rankOverlay").hidden = true;
   $("#chat").innerHTML = "";
   $("#setup").hidden = false;

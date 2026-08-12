@@ -15,6 +15,10 @@
   --shadow: rgba(60, 40, 10, 0.28);
   --serif: "KaiTi", "STKaiti", "楷体", "Songti SC", "SimSun", "Noto Serif SC", serif;
   --composer-control-height: 44px;
+  /* 动态意象层（由 ambient.js 按令字写入） */
+  --ambient-tint-rgb: 138, 122, 90;
+  --ambient-mood: 0;
+  --ambient-dark: 0;
 }
 
 * { box-sizing: border-box; }
@@ -24,15 +28,23 @@ html, body {
   margin: 0; height: 100%;
   font-family: var(--serif);
   color: var(--ink);
+  /* 宣纸：底色渐变 + 帘纹（竖）+ 纸纤维（斜）+ 做旧霉点 */
   background:
     radial-gradient(ellipse at 50% 0%, #f7eed4, var(--paper-2) 75%),
-    repeating-linear-gradient(45deg, rgba(120,80,20,.04) 0 2px, transparent 2px 7px);
+    radial-gradient(circle at 15% 82%, rgba(120,80,20,.06), transparent 42%),
+    radial-gradient(circle at 86% 18%, rgba(120,80,20,.05), transparent 38%),
+    radial-gradient(circle at 70% 70%, rgba(90,60,20,.04), transparent 30%),
+    repeating-linear-gradient(90deg, rgba(120,80,20,.032) 0 1px, transparent 1px 8px),
+    repeating-linear-gradient(45deg, rgba(120,80,20,.03) 0 1px, transparent 1px 9px);
   overscroll-behavior: none;
 }
+body { box-shadow: inset 0 0 120px rgba(90,60,20,.12); }
 
 button { font-family: inherit; cursor: pointer; }
 
 .app {
+  position: relative;
+  z-index: 1;
   max-width: 1080px;
   margin: 0 auto;
   height: 100%;
@@ -40,6 +52,128 @@ button { font-family: inherit; cursor: pointer; }
   flex-direction: column;
   padding: 0 max(12px, env(safe-area-inset-left))
            0 max(12px, env(safe-area-inset-right));
+}
+
+/* ============ 动态意象背景 ============ */
+.ambient-bg, .ambient-fg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ambient-bg { z-index: 0; }
+.ambient-fg { z-index: 2; }
+.ambient-shock {
+  position: fixed; inset: 0; z-index: 5;
+  pointer-events: none;
+  background: rgba(20,14,6,.36);
+  opacity: 0;
+  transition: opacity .12s ease;
+}
+body[data-shock="1"] .ambient-shock { opacity: 1; }
+
+.ambient-tint, .ambient-dark {
+  position: absolute; inset: 0;
+  transition: background .6s ease, opacity .6s ease;
+}
+.ambient-tint {
+  background:
+    radial-gradient(ellipse at 50% 28%, rgba(var(--ambient-tint-rgb),.11), transparent 62%),
+    radial-gradient(ellipse at 82% 82%, rgba(var(--ambient-tint-rgb),.07), transparent 55%);
+}
+.ambient-dark {
+  background: #120c04;
+  opacity: var(--ambient-dark);
+}
+
+/* 大形状：默认不可见，命中令字才淡入 */
+.shape {
+  position: absolute;
+  opacity: 0;
+  transition: opacity .8s ease;
+  pointer-events: none;
+}
+.shape-moon {
+  top: 7%; right: 13%;
+  width: 230px; height: 230px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(246,249,252,.6) 0%,
+    rgba(222,230,238,.32) 45%,
+    rgba(182,198,212,.13) 70%,
+    transparent 76%);
+  filter: blur(1px);
+}
+.shape-mountain {
+  left: 0; right: 0; bottom: 0;
+  height: 40%;
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  background-size: cover;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320' preserveAspectRatio='none'%3E%3Cpath fill='%234a4030' fill-opacity='0.22' d='M0,320 L0,210 L160,150 L320,200 L480,120 L640,190 L820,140 L980,205 L1160,135 L1320,195 L1440,170 L1440,320 Z'/%3E%3Cpath fill='%232e281c' fill-opacity='0.32' d='M0,320 L0,250 L120,220 L260,255 L420,200 L580,250 L740,215 L900,260 L1060,225 L1240,265 L1440,235 L1440,320 Z'/%3E%3C/svg%3E");
+}
+.shape-cloud {
+  top: 16%; left: 0; right: 0; height: 42%;
+  background:
+    linear-gradient(180deg, transparent, rgba(232,227,212,.16) 42%, rgba(232,227,212,.09) 60%, transparent),
+    radial-gradient(ellipse at 22% 50%, rgba(236,231,216,.22), transparent 42%),
+    radial-gradient(ellipse at 76% 42%, rgba(236,231,216,.18), transparent 46%);
+  filter: blur(7px);
+}
+.shape-glow {
+  bottom: 5%; left: 7%;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(202,152,72,.24), rgba(180,120,50,.09) 50%, transparent 70%);
+  filter: blur(9px);
+}
+
+body[data-kw="月"] .shape-moon,
+body[data-kw="山"] .shape-mountain,
+body[data-kw="云"] .shape-cloud,
+body[data-kw="酒"] .shape-glow { opacity: 1; }
+/* 云的透明度由 mood 联动，上面已设，这里给基准可见度 */
+body[data-kw="云"] .shape-cloud { opacity: calc(.65 + var(--ambient-mood) * .35); }
+
+/* 令字水印 */
+.ambient-wm {
+  position: absolute;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 46vmin;
+  line-height: 1;
+  font-weight: bold;
+  color: var(--ink);
+  opacity: .045;
+  letter-spacing: .05em;
+  white-space: nowrap;
+  user-select: none;
+  font-family: var(--serif);
+  text-shadow: 0 2px 8px rgba(60,40,10,.08);
+  transition: color .6s ease, opacity .6s ease;
+}
+.ambient-wm.pulse {
+  animation: wm-pulse .65s ease;
+}
+@keyframes wm-pulse {
+  0%   { transform: translate(-50%, -50%) scale(1);    opacity: .045; }
+  40%  { transform: translate(-50%, -50%) scale(1.04); opacity: .085; }
+  100% { transform: translate(-50%, -50%) scale(1);    opacity: .045; }
+}
+body[data-outcome="win"] .ambient-wm {
+  color: var(--vermilion);
+  opacity: .1;
+  transform: translate(-50%, -50%) scale(1.03);
+}
+body[data-outcome="lose"] .ambient-wm {
+  opacity: .02;
+  filter: grayscale(1) brightness(.6);
+}
+
+.ambient-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  transition: opacity .25s ease;
 }
 
 /* ============ 顶部栏 ============ */
@@ -124,7 +258,9 @@ button { font-family: inherit; cursor: pointer; }
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: rgba(255, 253, 242, 0.55);
+  background: rgba(255, 253, 242, 0.72);
+  -webkit-backdrop-filter: blur(4px) saturate(1.05);
+  backdrop-filter: blur(4px) saturate(1.05);
   border: 1px solid var(--line);
   border-radius: 10px;
   overflow: hidden;
@@ -512,4 +648,24 @@ input:disabled, button:disabled { opacity: .5; cursor: not-allowed; }
   .composer input { font-size: 15px; }
   #sendBtn { flex-basis: 56px; }
   #resignBtn { flex-basis: 50px; }
+}
+
+/* 手机端：意象层收一点，避免拥挤 */
+@media (max-width: 720px) {
+  .shape-moon { width: 160px; height: 160px; top: 5%; right: 8%; }
+  .shape-glow { width: 240px; height: 240px; }
+  .shape-mountain { height: 30%; }
+  .ambient-wm { font-size: 60vmin; opacity: .04; }
+}
+
+/* 无障碍：尊重减少动态偏好 */
+@media (prefers-reduced-motion: reduce) {
+  .portrait { animation: none !important; }
+  .ambient-fg { display: none !important; }
+  .ambient-canvas { transition: none !important; }
+  .ambient-wm { transition: none !important; }
+  .ambient-wm.pulse { animation: none !important; }
+  .shape, .ambient-tint, .ambient-dark { transition: none !important; }
+  .ambient-shock { transition: none !important; }
+  .msg.thinking .bubble { animation: none !important; }
 }
